@@ -19,7 +19,7 @@ export default function Redemption() {
   }
 
   const checkValidStaffID = (event : any) => {
-    getStaffDetails(staffId)
+    getStaffDetails(staffId.toUpperCase())
       .then(response => { 
         if (response.result) { 
           setToastMessage("Staff ID is valid")
@@ -41,7 +41,7 @@ export default function Redemption() {
   const redeemGift = async (event : any) => {
     const currentEpochMilliseconds: number = new Date().getTime();
     const redemptionDetails = { 
-      staff_pass_id: staffId, 
+      staff_pass_id: staffId.toUpperCase(), 
       redeemed_at: currentEpochMilliseconds
     }
     createRedemption(redemptionDetails)
@@ -50,7 +50,7 @@ export default function Redemption() {
           setToastMessage("Staff ID is not valid, please enter a valid staff ID")
           setSeverity("warning")
         } else if (response.message === "Already redeemed") { 
-          setToastMessage("Team has already redeemed gift")
+          setToastMessage("Team has already redeemed gift, redeemed by: " + response.data.staff_pass_id)
           setSeverity("warning")
         } else if (response.message === "Redemption created successfully") { 
           setToastMessage("New redemption recorded")

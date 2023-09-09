@@ -1,5 +1,4 @@
 import "./App.css";
-// import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material";
 import Redemption from "./pages/Redemption";
