@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, get } from "firebase/database";
 import fs from 'fs'; 
 import csv from 'csv-parser';
 
@@ -24,64 +24,113 @@ app.use(express.json());
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-app.get("/resetDatabase", (request: Request, response: Response) => {
-    set(ref(db, "/"), {});
-
+app.get("/resetDatabase", async (request: Request, response: Response) => {
     const team_mapping: Record<string, any> = {}; 
 
-    fs.createReadStream('assets/csv-team-mapping-long.csv')
-        .pipe(csv())
-        .on('data', (data) => team_mapping[data.staff_pass_id] = data)
-        .on('end', () => {
-            set(ref(db, "/"), {
-                team_mapping
+    try { 
+        await set(ref(db, "/"), {});
+        await fs.createReadStream('assets/csv-team-mapping-long.csv')
+            .pipe(csv())
+            .on('data', (data) => team_mapping[data.staff_pass_id] = data)
+            .on('end', () => {
+                set(ref(db, "/"), {
+                    team_mapping
+                });
+                return response.status(200).json({ 
+                    error: false,
+                    message: "Database reset successful",
+                    result: true
+                });
             });
-            response.send("Database reset successful");
+    } catch(error : any) { 
+        return response.status(500).json({
+            "error": true,
+            "message": error.message
         });
+    }
 });
 
-app.get("/find/:staffId", (request: Request, response: Response) => {
+app.get("/find/:staffId", async (request: Request, response: Response) => {
     const staffId = request.params.staffId;
-    console.log(staffId)
 
     const dataRef = ref(db, 'team_mapping/' + staffId);
-    onValue(dataRef, (snapshot: any) => {
-        const data = snapshot.val();
-        console.log(data)
-        response.send(data);
-      });
-});
-
-app.post("/redemption/check", async (request: Request, response: Response) => {
-    const team_name = request.body.team_name;
-
-    const dataRef = ref(db, 'redemption/' + team_name);
-    let exists = false; 
-    onValue(dataRef, (snapshot: any) => {
-        const data = snapshot.val();
-        console.log(data)
-        if (data) { 
-            return response.status(400).json(true);
-        } else { 
-            return response.status(400).json(false);
-        }
-    });
+    // var found = false; 
+    try { 
+        await onValue(dataRef, (snapshot: any) => {
+            const data = snapshot.val();
+            if (data) { 
+                return response.status(200).json({
+                    error: false, 
+                    message: "Staff ID found and returned", 
+                    result: true, 
+                    data: data
+                });
+            } else { 
+                return response.status(200).json({
+                    error: false,
+                    message: "Staff ID not found",
+                    result: false 
+                });
+            }
+        });
+    } catch(error : any) { 
+        return response.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
 });
 
 app.post("/redemption/create", async (request: Request, response: Response) => {
-    const {
-        team_name,
-        staff_pass_id,
-        redeemed_at
-    } = request.body;
+    const staffId = request.body.staff_pass_id;
+    const redeemed_at = request.body.redeemed_at;
 
-    const redemptionDetails = {
-        team_name: team_name, 
-        staff_pass_id: staff_pass_id, 
-        redeemed_at: redeemed_at
-    }; 
-    set(ref(db, "redemption/" + team_name), redemptionDetails);
-    return response.send("Redemption created successfully");
+    try {
+        const dataRefStaff = ref(db, 'team_mapping/' + staffId);
+        const snapshotStaff = await get(dataRefStaff); // Use get to await the data
+
+        if (snapshotStaff.exists()) {
+            const dataStaff = snapshotStaff.val();
+            const team_name = dataStaff.team_name;
+
+            const dataRefRedemption = ref(db, 'redemption/' + team_name);
+            const snapshotRedemption = await get(dataRefRedemption); // Use get to await the data
+
+            if (snapshotRedemption.exists()) {
+                return response.status(200).json({
+                    error: false, 
+                    message: "Already redeemed",
+                    result: false,
+                    data: snapshotRedemption.val()
+                });
+            } else { 
+                const redemptionDetails = {
+                    team_name: team_name, 
+                    staff_pass_id: staffId, 
+                    redeemed_at: redeemed_at
+                }; 
+                await set(ref(db, "redemption/" + team_name), redemptionDetails);
+
+                return response.status(200).json({
+                    error: false, 
+                    message: "Redemption created successfully",
+                    result: true, 
+                    data: redemptionDetails
+                });
+            }
+        } else { 
+            return response.status(200).json({
+                error: false,
+                message: "Staff ID not found",
+                result: false 
+            });
+        }
+    } catch(error : any) { 
+        return response.status(500).json({
+            error: true, 
+            message: error.message
+        });
+    }
 });
 
 app.listen(port, () => {
