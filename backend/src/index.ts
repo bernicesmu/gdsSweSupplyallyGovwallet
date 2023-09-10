@@ -5,9 +5,6 @@ import { getDatabase, ref, set, onValue, get } from "firebase/database";
 import fs from 'fs'; 
 import csv from 'csv-parser';
 
-const app = express();
-const port = 8000;
-
 const firebaseConfig = {
     apiKey: "AIzaSyD-A-_nLJTFtyWgCHL6Sx97hmaoAy2f6mM",
     authDomain: "gdsswegovwallet.firebaseapp.com",
@@ -18,6 +15,9 @@ const firebaseConfig = {
     appId: "1:462244065382:web:09a249df73ac7ce8fc7da7",
     measurementId: "G-1MP2YW3KGV",
 };
+
+const app = express();
+const port = 8000;
 
 app.use(cors());
 app.use(express.json());
@@ -136,3 +136,5 @@ app.post("/redemption/create", async (request: Request, response: Response) => {
 app.listen(port, () => {
     console.log(`Started application on port ${port}`);
 });
+
+export {app};
