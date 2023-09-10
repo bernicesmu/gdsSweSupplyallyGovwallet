@@ -7,8 +7,8 @@
 2. run `npm run start` to start the frontend server (running on `http://localhost:3000`)
 
 ## Instructions to run the unit testing (in the `/backend` folder)
-1. use the frontend page to reset redemptions 
-2. run `npm test` to run all 6 unit tests
+1. run `npm test` to run all 6 unit tests
+2. all redemptions in the database will be deleted each time `npm test` is run
 
 ## Tech stacks used 
 - Database: Firebase
