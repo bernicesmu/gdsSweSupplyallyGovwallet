@@ -7,6 +7,7 @@
 2. run `npm run start` to start the frontend server (running on `http://localhost:3000`)
 
 ## Tech stacks used 
+- Database: Firebase
 - Backend: Node.js and Express.js, codes written in Typescript
 - Frontend: React.js and Material UI, codes written in Typescript 
 
