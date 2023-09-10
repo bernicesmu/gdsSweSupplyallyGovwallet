@@ -24,7 +24,7 @@
           - Staff successfully collects their team's gift
   - Results will be shown at the bottom of the screen in the form of a snackbar
 - Reset the redemptions
-  - Used to clear all the redemptions that have been made
+  - This button is for admin to clear all the redemptions that have been made
   - All users running this app will edit the same database, hence another user's action may interfere with your results
 
 ## Assumptions 
