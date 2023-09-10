@@ -6,10 +6,15 @@
 1. run `npm install` to install all the dependencies 
 2. run `npm run start` to start the frontend server (running on `http://localhost:3000`)
 
+## Instructions to run the unit testing (in the `/backend` folder)
+1. use the frontend page to reset redemptions 
+2. run `npm test` to run all 6 unit tests
+
 ## Tech stacks used 
 - Database: Firebase
 - Backend: Node.js and Express.js, codes written in Typescript
-- Frontend: React.js and Material UI, codes written in Typescript 
+- Frontend: React.js and Material UI, codes written in Typescript
+- Testing: Mocha and Chai
 
 ## Instructions to use the frontend 
 - Enter a staff pass ID
