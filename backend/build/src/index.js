@@ -19,22 +19,13 @@ const app_1 = require("firebase/app");
 const database_1 = require("firebase/database");
 const fs_1 = __importDefault(require("fs"));
 const csv_parser_1 = __importDefault(require("csv-parser"));
-const firebaseConfig = {
-    apiKey: "AIzaSyCbZnjvgYr5SiqpVVRQ3DNNImsC7EyckSE",
-    authDomain: "govtechsupplyallygovwallet.firebaseapp.com",
-    databaseURL: "https://govtechsupplyallygovwallet-default-rtdb.firebaseio.com",
-    projectId: "govtechsupplyallygovwallet",
-    storageBucket: "govtechsupplyallygovwallet.appspot.com",
-    messagingSenderId: "171287448862",
-    appId: "1:171287448862:web:c59bcc084f75acbfb84d0f",
-    measurementId: "G-TD7SX4XXEP"
-};
+const config_1 = __importDefault(require("./config"));
 const app = (0, express_1.default)();
 exports.app = app;
 const port = 8000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-const firebaseApp = (0, app_1.initializeApp)(firebaseConfig);
+const firebaseApp = (0, app_1.initializeApp)(config_1.default);
 const db = (0, database_1.getDatabase)(firebaseApp);
 function resetDb() {
     return __awaiter(this, void 0, void 0, function* () {
