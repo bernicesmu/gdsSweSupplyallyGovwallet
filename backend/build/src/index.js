@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.app = void 0;
+exports.resetDb = exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const app_1 = require("firebase/app");
@@ -20,14 +20,14 @@ const database_1 = require("firebase/database");
 const fs_1 = __importDefault(require("fs"));
 const csv_parser_1 = __importDefault(require("csv-parser"));
 const firebaseConfig = {
-    apiKey: "AIzaSyD-A-_nLJTFtyWgCHL6Sx97hmaoAy2f6mM",
-    authDomain: "gdsswegovwallet.firebaseapp.com",
-    databaseURL: "https://gdsswegovwallet-default-rtdb.firebaseio.com",
-    projectId: "gdsswegovwallet",
-    storageBucket: "gdsswegovwallet.appspot.com",
-    messagingSenderId: "462244065382",
-    appId: "1:462244065382:web:09a249df73ac7ce8fc7da7",
-    measurementId: "G-1MP2YW3KGV",
+    apiKey: "AIzaSyCbZnjvgYr5SiqpVVRQ3DNNImsC7EyckSE",
+    authDomain: "govtechsupplyallygovwallet.firebaseapp.com",
+    databaseURL: "https://govtechsupplyallygovwallet-default-rtdb.firebaseio.com",
+    projectId: "govtechsupplyallygovwallet",
+    storageBucket: "govtechsupplyallygovwallet.appspot.com",
+    messagingSenderId: "171287448862",
+    appId: "1:171287448862:web:c59bcc084f75acbfb84d0f",
+    measurementId: "G-TD7SX4XXEP"
 };
 const app = (0, express_1.default)();
 exports.app = app;
@@ -36,9 +36,9 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 const firebaseApp = (0, app_1.initializeApp)(firebaseConfig);
 const db = (0, database_1.getDatabase)(firebaseApp);
-app.get("/resetDatabase", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-    const team_mapping = {};
-    try {
+function resetDb() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const team_mapping = {};
         yield (0, database_1.set)((0, database_1.ref)(db, "/"), {});
         yield fs_1.default.createReadStream('assets/csv-team-mapping-long.csv')
             .pipe((0, csv_parser_1.default)())
@@ -47,11 +47,17 @@ app.get("/resetDatabase", (request, response) => __awaiter(void 0, void 0, void 
             (0, database_1.set)((0, database_1.ref)(db, "/"), {
                 team_mapping
             });
-            return response.status(200).json({
-                error: false,
-                message: "Database reset successful",
-                result: true
-            });
+        });
+    });
+}
+exports.resetDb = resetDb;
+app.get("/resetDatabase", (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        resetDb();
+        return response.status(200).json({
+            error: false,
+            message: "Database reset successful",
+            result: true
         });
     }
     catch (error) {

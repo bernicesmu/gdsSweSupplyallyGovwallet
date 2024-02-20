@@ -6,15 +6,15 @@ import fs from 'fs';
 import csv from 'csv-parser';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD-A-_nLJTFtyWgCHL6Sx97hmaoAy2f6mM",
-    authDomain: "gdsswegovwallet.firebaseapp.com",
-    databaseURL: "https://gdsswegovwallet-default-rtdb.firebaseio.com",
-    projectId: "gdsswegovwallet",
-    storageBucket: "gdsswegovwallet.appspot.com",
-    messagingSenderId: "462244065382",
-    appId: "1:462244065382:web:09a249df73ac7ce8fc7da7",
-    measurementId: "G-1MP2YW3KGV",
-};
+    apiKey: "AIzaSyCbZnjvgYr5SiqpVVRQ3DNNImsC7EyckSE",
+    authDomain: "govtechsupplyallygovwallet.firebaseapp.com",
+    databaseURL: "https://govtechsupplyallygovwallet-default-rtdb.firebaseio.com",
+    projectId: "govtechsupplyallygovwallet",
+    storageBucket: "govtechsupplyallygovwallet.appspot.com",
+    messagingSenderId: "171287448862",
+    appId: "1:171287448862:web:c59bcc084f75acbfb84d0f",
+    measurementId: "G-TD7SX4XXEP"
+};  
 
 const app = express();
 const port = 8000;
@@ -24,24 +24,27 @@ app.use(express.json());
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getDatabase(firebaseApp);
 
-app.get("/resetDatabase", async (request: Request, response: Response) => {
-    const team_mapping: Record<string, any> = {}; 
-
-    try { 
-        await set(ref(db, "/"), {});
-        await fs.createReadStream('assets/csv-team-mapping-long.csv')
-            .pipe(csv())
-            .on('data', (data) => team_mapping[data.staff_pass_id] = data)
-            .on('end', () => {
-                set(ref(db, "/"), {
-                    team_mapping
-                });
-                return response.status(200).json({ 
-                    error: false,
-                    message: "Database reset successful",
-                    result: true
-                });
+async function resetDb() { 
+    const team_mapping: Record<string, any> = {};
+    await set(ref(db, "/"), {});
+    await fs.createReadStream('assets/csv-team-mapping-long.csv')
+        .pipe(csv())
+        .on('data', (data) => team_mapping[data.staff_pass_id] = data)
+        .on('end', () => {
+            set(ref(db, "/"), {
+                team_mapping
             });
+        });
+}
+
+app.get("/resetDatabase", async (request: Request, response: Response) => {
+    try { 
+        resetDb()
+        return response.status(200).json({ 
+            error: false,
+            message: "Database reset successful",
+            result: true
+        });
     } catch(error : any) { 
         return response.status(500).json({
             "error": true,
@@ -137,4 +140,4 @@ app.listen(port, () => {
     console.log(`Started application on port ${port}`);
 });
 
-export {app};
+export {app, resetDb};
